@@ -20,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="TP properties histograms from a tpstream file.")
     parser.add_argument("-i", "--input", required=True, help="Input data file")
     parser.add_argument("-e", "--event", type=str, default="-1", help="Event or range of events to plot (use -1 to plot all events)")
+    parser.add_argument("-t", "--threshold", help='Specify whether only hit spectra above a certain ADC threshold should be plotted')
     parser.add_argument("-o", "--output", help="Output PDF filename (optional)")
     
     args = parser.parse_args()
@@ -33,11 +34,14 @@ def main():
     hits_['ID'] = hits_['ID'].replace(1, 'signal')
     hits_['ID'] = hits_['ID'].replace(2, 'radio. bgd')
 
-    # Filter events based on the passed event numbers 
+    # Filter events based on passed flags
     if args.event != "-1":
         # Convert event argument to a list of event numbers
         events_to_plot = [int(e) for e in args.event.split(',')]
         hits_ = hits_[hits_['event'].isin(events_to_plot)]
+
+    if args.threshold:
+        hits_ = hits_[(hits_.peakADC > int(args.threshold))]
 
     # Define the columns to be plotted and create subplots
     cols = ['SADC', 'peakADC', 'TOT', 'channel', 'peakT', 'plane']
