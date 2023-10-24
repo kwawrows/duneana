@@ -95,26 +95,37 @@ TriggerPrimitiveFinderPass1::hitFinding(const std::vector<short>& waveform,
     //---------------------------------------------
     bool is_hit=false;
     bool was_hit=false;
-    TriggerPrimitiveFinderTool::Hit hit(channel, 0, 0, 0);
+    std::vector<int> hit_charge; 
+
+    //Initialize current hit 
+    TriggerPrimitiveFinderTool::Hit hit(channel, 0, 0, 0, 0, 0);
+
+    // Loop over ADCs in the waveform 
     for(size_t isample=0; isample<waveform.size()-1; ++isample){
-        // if(ich>11510) std::cout << isample << " " << std::flush;
+
         int sample_time=isample*m_downsampleFactor;
         short adc=waveform[isample];
+
         is_hit=adc>(short)m_threshold;
+
         if(is_hit && !was_hit){
             // We just started a hit. Set the start time
             hit.startTime=sample_time;
-            hit.charge=adc;
-            hit.timeOverThreshold=m_downsampleFactor;
+            hit_charge.push_back(adc);
+	    hit.SADC = adc;
+            hit.timeOverThreshold=1;//m_downsampleFactor;
         }
         if(is_hit && was_hit){
-            hit.charge+=adc*m_downsampleFactor;
-            hit.timeOverThreshold+=m_downsampleFactor;
+	  hit.SADC += adc * m_downsampleFactor;
+	  hit_charge.push_back(adc); 
+	  hit.timeOverThreshold+=1;//m_downsampleFactor;
         }
         if(!is_hit && was_hit){
-            // The hit is over. Push it to the output vector
-            hit.charge/=m_multiplier;
-            hits.push_back(hit);
+	  hit.peakCharge =  *std::max_element(hit_charge.begin(), hit_charge.end()); 
+	  hit.peakTime = std::distance(hit_charge.begin(), std::max_element(hit_charge.begin(), hit_charge.end())) + hit.startTime;
+	  // The hit is over. Push it to the output vector
+	  hits.push_back(hit);
+	  hit_charge.clear(); 
         }
         was_hit=is_hit;
     }
@@ -128,9 +139,6 @@ TriggerPrimitiveFinderPass1::findHits(const std::vector<unsigned int>& channel_n
     auto hits=std::vector<TriggerPrimitiveFinderTool::Hit>();
     std::cout << "findHits called with " << collection_samples.size()
               << " channels. First chan has " << collection_samples[0].size() << " samples" << std::endl;
-    // std::cout << "First few samples: ";
-    // for(int i=0; i<10; ++i) std::cout << collection_samples[0][i] << " ";
-    // std::cout << std::endl;
 
     for(size_t ich=0; ich<collection_samples.size(); ++ich){
         const std::vector<short>& waveformOrig=collection_samples[ich];
@@ -143,7 +151,7 @@ TriggerPrimitiveFinderPass1::findHits(const std::vector<unsigned int>& channel_n
             pedsub[i]=waveform[i]-pedestal[i];
         }
 
-        std::vector<short> filtered=filter(pedsub);
+        std::vector<short> filtered=filter(pedsub); 
         hitFinding(filtered, hits, channel_numbers[ich]);
     }
     std::cout << "Returning " << hits.size() << " hits" << std::endl;

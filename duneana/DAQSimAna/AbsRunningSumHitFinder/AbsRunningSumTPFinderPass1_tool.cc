@@ -53,7 +53,7 @@ std::vector<short> AbsRunningSumTPFinderPass1::AbsRunningSum(const std::vector<s
   for (size_t i=0; i<pedsub_waveform.size(); ++i) { 
 
     //guard the signal from overflowing
-    absRS[i] = std::min( int(R*absRS[i-1] + std::abs(pedsub_waveform[i]/s)), adcMax);
+    absRS[i] = std::min( int(R*absRS[i-1] + std::abs(pedsub_waveform[i])/s), adcMax);
 
   }
   return absRS;
@@ -73,17 +73,18 @@ AbsRunningSumTPFinderPass1::hitFinding(const std::vector<short>& waveform,
   std::vector<int> hit_charge; 
   //initialize the hit 
   AbsRunningSumTPFinderTool::Hit hit(channel, 0, 0, 0, 0, 0);
-  
   for(size_t isample=0; isample<waveform.size()-1; ++isample){
-    short adc         = waveform[isample];
-    //ignore first ~100 ticks to let the pedestal stabilise    
-    if (isample > 100) {
+
+    //Ignore the first ~20 ticks to let the pedestal stabilise. 
+    if (isample > 20) { 
+      short adc         = waveform[isample];
+      
       is_hit = adc >  (short)m_threshold;
       if(is_hit && !was_hit) {
 	hit_charge.push_back(adc); 
 	hit.startTime         = isample;
 	hit.SADC              = adc;
-	hit.timeOverThreshold = 0;
+	hit.timeOverThreshold = 1;
       }
       if(is_hit && was_hit) {
 	hit.SADC              += adc;
@@ -95,11 +96,12 @@ AbsRunningSumTPFinderPass1::hitFinding(const std::vector<short>& waveform,
 	hit.peakTime = std::distance(hit_charge.begin(), std::max_element(hit_charge.begin(), hit_charge.end())) + hit.startTime; 
 	hits.push_back(hit);
 	hit_charge.clear();
-      }
+      }    
+      was_hit = is_hit; 
     }
-    was_hit = is_hit; 
-  } 
-}
+  }
+} 
+
 
 
 std::vector<AbsRunningSumTPFinderTool::Hit>
@@ -107,8 +109,6 @@ AbsRunningSumTPFinderPass1::findHits(const std::vector<unsigned int>& channel_nu
 				  const std::vector<std::vector<short>>& adc_samples) {
 
   auto hits = std::vector<AbsRunningSumTPFinderTool::Hit>();
-  std::cout << "findHits called with "      << adc_samples.size()
-	    << " channels. First chan has " << adc_samples[0].size() << " samples" << std::endl;
 
   for(size_t ich=0; ich<adc_samples.size(); ++ich){
     const std::vector<short>& waveform = adc_samples[ich];
@@ -126,9 +126,11 @@ AbsRunningSumTPFinderPass1::findHits(const std::vector<unsigned int>& channel_nu
     for (size_t j = 0; j < AbsRS_pedsub.size(); ++j){
       AbsRS_pedsub[j] = AbsRS[j] - AbsRS_ped[j];
     }
+
     //hit finding 
     hitFinding(AbsRS_pedsub, hits, channel_numbers[ich]);
   }
+  std::cout<< " ---- Using AbsRS hit finder --- " << std::endl;
   std::cout << "Returning " << hits.size() << " hits for a threshold of " << m_threshold << std::endl;
   return hits;
 }

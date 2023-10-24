@@ -69,13 +69,18 @@ void TriggerPrimitiveFinder::produce(art::Event & e)
     std::vector<unsigned int> channel_numbers;
     std::map<raw::ChannelID_t, const raw::RawDigit*> chanToDigit;
     for(auto&& digit: digits_in){
-        // Select just the collection channels for the primitive-finding algorithm
+        // KW : use all channels (not just collection) for the HF 
+	chanToDigit[digit.Channel()]=&digit;
+	channel_numbers.push_back(digit.Channel());
+	collection_samples.push_back(digit.ADCs());
+	/*
         const geo::SigType_t sigType = geo->SignalType(digit.Channel());
         if(sigType==geo::kCollection){
             chanToDigit[digit.Channel()]=&digit;
             channel_numbers.push_back(digit.Channel());
             collection_samples.push_back(digit.ADCs());
         }
+	*/
     }
 
     // Pass the full list of collection channels to the hit finding algorithm
@@ -96,13 +101,13 @@ void TriggerPrimitiveFinder::produce(art::Event & e)
                               hit.startTime,                        //START TICK.
                               hit.startTime+hit.timeOverThreshold,  //END TICK. 
                               hit.timeOverThreshold,                //RMS.
-                              hit.startTime,                        //PEAK_TIME.
+                              hit.peakTime,                         //PEAK_TIME.
                               0,                                    //SIGMA_PEAK_TIME.
-                              0,                                    //PEAK_AMPLITUDE.
+                              hit.peakCharge,                       //PEAK_AMPLITUDE.
                               0,                                    //SIGMA_PEAK_AMPLITUDE.
-                              hit.charge,                           //HIT_INTEGRAL.
+                              hit.SADC,                             //HIT_INTEGRAL.
                               0,                                    //HIT_SIGMA_INTEGRAL.
-                              hit.charge,                           //SUMMED CHARGE. 
+                              hit.SADC,                             //SUMMED CHARGE. 
                               0,                                    //MULTIPLICITY.
                               0,                                    //LOCAL_INDEX.
                               0,                                    //WIRE ID.

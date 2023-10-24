@@ -1,6 +1,6 @@
 include(MakeDuneToolBuilder)
 add_subdirectory(SNAnaClustering)
-add_subdirectory(RunningSumHitFinder)
+add_subdirectory(SNPointingTools)
 add_subdirectory(AbsRunningSumHitFinder)
 
 make_dune_tool_builder(dunecore::TriggerPrimitiveFinderTool)
