@@ -16,7 +16,7 @@ tagged_TP_dump_config: {
    GenLabel:      "marley"
    GEANT4Label:   "largeant"
    AbsRSHits:      true
-   HitWindow:      25
+   HitWindow:      35
 }
 END_PROLOG
 
