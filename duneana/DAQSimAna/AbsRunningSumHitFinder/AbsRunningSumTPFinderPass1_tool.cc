@@ -17,7 +17,7 @@ AbsRunningSumTPFinderPass1::AbsRunningSumTPFinderPass1(fhicl::ParameterSet const
     m_signalKillThreshold(p.get<short>             ("SignalKillThreshold"  ,                          15)),
     m_signalKillNContig  (p.get<short>             ("SignalKillNContig"    ,                           1)),
     m_frugalNContig      (p.get<short>             ("FrugalPedestalNContig",                          10)),
-    m_R                  (p.get<float>             ("R",                                              0.8))
+    m_R                  (p.get<float>             ("R",                                              0.9))
    
 {
 
