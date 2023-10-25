@@ -21,7 +21,7 @@ def main():
     parser.add_argument("-i", "--input", required=True, help="Input data file")
     parser.add_argument("-e", "--event", type=str, default="-1", help="Event or range of events to plot (use -1 to plot all events)")
     parser.add_argument("-t", "--threshold", help='Specify whether only hit spectra above a certain ADC threshold should be plotted')
-    parser.add_argument("-o", "--output", help="Output PDF filename (optional)")
+    parser.add_argument("-o", "--output", default="TPSpectra.pdf", help="Output PDF filename (optional)")
     
     args = parser.parse_args()
 
