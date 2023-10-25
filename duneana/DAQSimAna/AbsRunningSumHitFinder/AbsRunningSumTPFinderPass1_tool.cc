@@ -75,8 +75,8 @@ AbsRunningSumTPFinderPass1::hitFinding(const std::vector<short>& waveform,
   AbsRunningSumTPFinderTool::Hit hit(channel, 0, 0, 0, 0, 0);
   for(size_t isample=0; isample<waveform.size()-1; ++isample){
 
-    //Ignore the first ~20 ticks to let the pedestal stabilise. 
-    if (isample > 20) { 
+    //Ignore the first ~100 ticks to let the pedestal stabilise. 
+    if (isample > 100) { 
       short adc         = waveform[isample];
       
       is_hit = adc >  (short)m_threshold;
