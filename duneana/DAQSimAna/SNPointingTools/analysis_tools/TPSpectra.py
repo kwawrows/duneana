@@ -33,6 +33,13 @@ def main():
     hits_['ID'] = hits_['ID'].replace(0, 'noise')
     hits_['ID'] = hits_['ID'].replace(1, 'signal')
     hits_['ID'] = hits_['ID'].replace(2, 'radio. bgd')
+    
+    custom_palette = {
+    'noise': 'white',
+    'signal': 'red',
+    'radio. bgd': 'blue'
+    }
+
 
     # Filter events based on passed flags
     if args.event != "-1":
@@ -58,10 +65,10 @@ def main():
         if column == 'plane':
             bin_edges = [-0.4, 0.4, 0.6, 1.4, 1.6, 2.4]
             sns.histplot(data=hits_, x=column, hue='ID', element='step', hue_order=id_order,
-                         ax=ax, bins=bin_edges, common_norm=True, palette='bwr_r')
+                         ax=ax, bins=bin_edges, common_norm=True, palette=custom_palette)
         else:
             sns.histplot(data=hits_, x=column, hue='ID', element='step', hue_order=id_order,
-                         ax=ax, bins=60, common_norm=True, palette='bwr_r')
+                         ax=ax, bins=60, common_norm=True, palette=custom_palette)
         ax.set_title(f'{column}')
         ax.set_ylabel('Frequency')
         ax.set_yscale('log')
