@@ -272,6 +272,34 @@ void TPStreamer::analyze(art::Event const & evt)
 		 << ThisHit.PeakTime() << ',' << ThisHit.EndTick() - ThisHit.StartTick() << ',' << ThisHit.Channel() << ','
 		 << ThisHit.SummedADC() << ',' << ThisHit.PeakAmplitude() << ',' << ThisPType << ',' <<  std::endl; 
 
+   // ---- Updated format ----
+   /* 
+   // to match DAQ (just for simplicity), format needs to be
+    // ([tp.time_start, tp.time_over_threshold, tp.time_peak, tp.channel, tp.adc_integral, tp.adc_peak, tp.detid, tp.flag, tp.version]) + truth
+
+    // changed to match TP format
+    // to not have overlapping timestamps, adding a time offset event by event
+    double event_length = 4492; // this is NumberTimeSamples, can improve instead of writing here
+    double event_time_offset = evt.event()*event_length;; 
+
+    m_outputFile
+     << ThisHit.StartTick() + event_time_offset << ' '
+     << ThisHit.EndTick() - ThisHit.StartTick() << ' ' 
+		 << ThisHit.PeakTime() + event_time_offset << ' ' 
+     << ThisHit.Channel() << ' '
+		 << ThisHit.SummedADC() << ' '  
+     << ThisHit.PeakAmplitude() << ' '
+     << (int) ThisHit.Channel()/2560 << ' '
+     << 0 << ' '
+     << 1 << ' '
+     << ThisPType << ' ' 
+     << evt.event() << ' '
+     << ThisHit.View() << ' ' 
+     <<  std::endl; 
+
+
+  */
+
   } // Loop over reco_hits.
 } // Analyze TPStreamer.
 
