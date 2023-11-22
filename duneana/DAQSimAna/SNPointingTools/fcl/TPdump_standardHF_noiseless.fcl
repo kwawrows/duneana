@@ -45,7 +45,7 @@ physics: {
          module_type: "SimWireDUNE"
          SimChannelLabel: "elecDrift"
          NoiseOn: false
-         PedestalOn: false
+         PedestalOn: true
          DistortOn: false
          SuppressOn: false
          KeepEmptyChannels: true
