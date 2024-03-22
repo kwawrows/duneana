@@ -106,8 +106,10 @@ TriggerPrimitiveFinderPass2::findHits(const std::vector<unsigned int>& channel_n
             pedsub[i]=waveform[i]-pedestal[i];
         }
         std::vector<short> iqr=frugal_iqr(waveform, pedestal, m_frugalNContig);
-        std::vector<short> filtered=filter(pedsub);
-        hitFinding(filtered, iqr, hits, channel_numbers[ich]);
+        //skip the filtering
+	//std::vector<short> filtered=filter(pedsub);
+        //hitFinding(filtered, iqr, hits, channel_numbers[ich]);
+	hitFinding(pedsub, iqr, hits, channel_numbers[ich]);
     }
     std::cout << "Returning " << hits.size() << " hits" << std::endl;
     std::cout << "hits/channel=" << float(hits.size())/collection_samples.size() << std::endl;
