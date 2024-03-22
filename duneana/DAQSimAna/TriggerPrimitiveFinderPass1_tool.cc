@@ -150,9 +150,12 @@ TriggerPrimitiveFinderPass1::findHits(const std::vector<unsigned int>& channel_n
         for(size_t i=0; i<pedsub.size(); ++i){
             pedsub[i]=waveform[i]-pedestal[i];
         }
-
+	//skip the FIR filter (using Simple Threshold alg)
+	/*
         std::vector<short> filtered=filter(pedsub); 
         hitFinding(filtered, hits, channel_numbers[ich]);
+	*/
+	hitFinding(pedsub, hits, channel_numbers[ich]);
     }
     std::cout << "Returning " << hits.size() << " hits" << std::endl;
     std::cout << "hits/channel=" << float(hits.size())/collection_samples.size() << std::endl;
